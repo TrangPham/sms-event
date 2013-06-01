@@ -46,6 +46,7 @@ class IncomingController < ApplicationController
     return "Event #{method_params} does not exist" if event.nil?
 
     if event.organizer.phone == params["from_number"]
+      #TODO: set event status to canceled
       more = []
       event.users.each do |user| 
         more << {"content" => "Event #{method_params} #{event.name} was canceled", "to_number" => user.phone.to_s}
@@ -87,5 +88,10 @@ class IncomingController < ApplicationController
   end
 
   def call_status(params, method_params)
+    event = Event.find_by_event_id(method_params)
+    return "Event #{event_id} does not exist" if event.nil? 
+    return "Event was cancelled" if event.status == "cancelled"
+    return "#{event.name.titleize} is gonna rock!"
   end
+
 end
