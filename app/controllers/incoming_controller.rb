@@ -19,16 +19,18 @@ class IncomingController < ApplicationController
     {"messages" => [{"content" => content}]}
   end
 
-    def call_hello(params, method_params)
-      {"messages" => [{"content" => "Goodbye #{method_params}"}]}.to_json
-    end
+  def call_hello(params, method_params)
+    "Goodbye #{method_params}"
+  end
 
-    def call_help(params, method_params)
-      case method_params
-      when nil
-        return "Help text goes here"
-      when "register"
-        return "Register help text"
-      end
+  def call_help(params, method_params)
+    case method_params
+    when nil
+      return "Help text goes here"
+    when "register"
+      return "Register help text"
+    else
+      return "WTF??"
     end
+  end
 end
