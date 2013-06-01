@@ -3,5 +3,5 @@ class User < ActiveRecord::Base
 
   validates :phone, uniqueness: true 
 
-  has_many :events, through: :event_users
+  has_and_belongs_to_many :events
 end
