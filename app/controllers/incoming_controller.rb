@@ -6,8 +6,14 @@ class IncomingController < ApplicationController
     "unregister" => "Usage: 'unregister [event id]'",
     "create" => "create [event name], [event info]",
     "message" => "message [event id] [message]",
+<<<<<<< HEAD
     "cancel" => "cancel [event id]"
     }
+=======
+    "cancel" => "cancel [event id]",
+    "info" => "info [event id]"
+  }
+>>>>>>> 0364f3a65ec7e37448339cf902d63b4f0a9249c6
 
   def parse
     Rails.logger.info(params)
@@ -107,11 +113,11 @@ class IncomingController < ApplicationController
     end
   end
 
-  def call_status(params, method_params)
+  def call_info(params, method_params)
     event = Event.find_by_event_id(method_params)
     return "Event #{event_id} does not exist" if event.nil? 
     return "Event was cancelled" if event.status == "cancelled"
-    return "#{event.name.titleize} is gonna rock!"
+    return  "ID: #{event.event_id} Name: #{event.name.titleize} Registered: #{event.users.count} Info:#{event.description}"    
   end
 
 end
