@@ -26,11 +26,11 @@ class IncomingController < ApplicationController
   def call_help(params, method_params)
     case method_params
     when nil
-      return "Help text goes here"
+      return "Available commands: register, create, unregister, message, status. Send 'help COMMAND' for more info"
     when "register"
       return "Register help text"
     else
-      return "WTF??"
+      return "Sorry, #{method_params} is not a command"
     end
   end
 end
