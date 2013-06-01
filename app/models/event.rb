@@ -1,9 +1,10 @@
 class Event < ActiveRecord::Base
-  attr_accessible :event_id, :name
+  attr_accessible :event_id, :name, :organizer
 
   validate :name, presence: true, uniqueness: true
 
   before_create :set_event_id
+  has_one :organizer, :class_name => "User"
 
   def set_event_id
     _event_id = 0
