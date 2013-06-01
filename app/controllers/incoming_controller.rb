@@ -6,7 +6,7 @@ class IncomingController < ApplicationController
     begin
       method, method_params = params["content"].split(" ", 2)
       raw = send("call_#{method}".to_sym, params, method_params)
-      render json: response(raw)
+      render json: sms_response(raw)
     rescue StandardError
       Rails.logger.info("invalid, try again")
       render nothing: true, status: 200
@@ -15,7 +15,7 @@ class IncomingController < ApplicationController
 
   private
 
-  def response(content)
+  def sms_response(content)
     {"messages" => [{"content" => content}]}
   end
 
