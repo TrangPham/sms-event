@@ -14,6 +14,5 @@ class Event < ActiveRecord::Base
     self.event_id = _event_id 
   end
 
-  has_many :users, through: :event_users
-
+  has_and_belongs_to_many :users
 end
