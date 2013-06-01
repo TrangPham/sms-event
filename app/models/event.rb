@@ -4,7 +4,7 @@ class Event < ActiveRecord::Base
   validate :event_id, presence: true, uniqueness: true
 
   before_create :set_event_id
-  has_one :organizer, :class_name => "User"
+  belongs_to :organizer, :class_name => "User"
 
   def set_event_id
     _event_id = 0
