@@ -57,4 +57,5 @@ SmsEvent::Application.routes.draw do
   # match ':controller(/:action(/:id))(.:format)'
 
   match 'incoming' => 'incoming#parse'
+  match 'events/:id' => 'events#view'
 end
