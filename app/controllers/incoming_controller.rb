@@ -5,8 +5,8 @@ class IncomingController < ApplicationController
 
     begin
       method, method_params = params["content"].split(" ", 2)
-      response = send("call_#{method}".to_sym, params, method_params)
-      render json: response
+      raw = send("call_#{method}".to_sym, params, method_params)
+      render json: response(raw)
     rescue StandardError
       Rails.logger.info("invalid, try again")
       render nothing: true, status: 200
@@ -14,7 +14,21 @@ class IncomingController < ApplicationController
   end
 
   private
+
+  def response(content)
+    {"messages" => [{"content" => content}]}
+  end
+
     def call_hello(params, method_params)
       {"messages" => [{"content" => "Goodbye #{method_params}"}]}.to_json
+    end
+
+    def call_help(params, method_params)
+      case method_params
+      when nil
+        return "Help text goes here"
+      when "register"
+        return "Register help text"
+      end
     end
 end
