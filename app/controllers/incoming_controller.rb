@@ -6,7 +6,8 @@ class IncomingController < ApplicationController
     "unregister" => "Usage: 'unregister [event id]'",
     "create" => "create [event name]",
     "message" => "message [event id] [message]",
-    "cancel" => "cancel [event id]"
+    "cancel" => "cancel [event id]",
+    "info" => "info [event id]"
   }
 
   def parse
@@ -87,11 +88,11 @@ class IncomingController < ApplicationController
     end
   end
 
-  def call_status(params, method_params)
+  def call_info(params, method_params)
     event = Event.find_by_event_id(method_params)
     return "Event #{event_id} does not exist" if event.nil? 
     return "Event was cancelled" if event.status == "cancelled"
-    return "#{event.name.titleize} is gonna rock!"
+    return  "ID: #{event.event_id} Name: #{event.name.titleize} Registered: #{event.users.count} Info:#{event.description}"    
   end
 
 end
