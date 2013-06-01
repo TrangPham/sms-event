@@ -15,9 +15,9 @@ class IncomingController < ApplicationController
 
   private
 
-  def response(content)
-    {"messages" => [{"content" => content}]}
-  end
+    def response(content)
+      {"messages" => [{"content" => content}]}
+    end
 
     def call_hello(params, method_params)
       {"messages" => [{"content" => "Goodbye #{method_params}"}]}.to_json
@@ -30,5 +30,10 @@ class IncomingController < ApplicationController
       when "register"
         return "Register help text"
       end
+    end
+
+    def call_create(params, method_params)
+      event  = Event.create({:name => method_params})
+      return "Event created, register for event using 'register #{event.event_id}'"
     end
 end
