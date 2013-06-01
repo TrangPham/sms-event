@@ -1,0 +1,10 @@
+<% if @events.blank? %>
+<p>There are not any events currently in the system.</p>
+<% else %>
+<p>These are no current events in our system</p>
+<ul id="events">
+	<% @event.users.each do |c| %>
+	<li>c.phone</li>
+<% end %>
+</ul>
+<% end %>
