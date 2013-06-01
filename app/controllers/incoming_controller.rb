@@ -15,6 +15,6 @@ class IncomingController < ApplicationController
 
   private
     def call_hello(params, method_params)
-      {"messages" => {"content" => "Goodbye #{method_params}"}}.to_json
+      {"messages" => [{"content" => "Goodbye #{method_params}"}]}.to_json
     end
 end
