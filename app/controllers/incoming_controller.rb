@@ -5,8 +5,8 @@ class IncomingController < ApplicationController
 
     begin
       method, method_params = params["content"].split(" ", 2)
-      raw = send("call_#{method.downcase}".to_sym, params, method_params)
-      render json: sms_response(raw)
+      content, more = send("call_#{method.downcase}".to_sym, params, method_params)
+      render json: sms_response(content, more)
     rescue StandardError
       Rails.logger.info("invalid, try again")
       render nothing: true, status: 200
@@ -15,8 +15,10 @@ class IncomingController < ApplicationController
 
   private
 
-    def response(content)
-      {"messages" => [{"content" => content}]}
+    def sms_response(content, more = [])  
+      to_return = {"messages" => [{"content" => content}]}
+      more.each do {|m| to_return["messages"] << m}
+      to_return
     end
 
     def call_hello(params, method_params)
@@ -44,22 +46,28 @@ class IncomingController < ApplicationController
     def call_register(params, method_params)
       user = User.find_or_create_by_phone({:phone=> params["from_number"]})
       event = Event.find_by_event_id(method_params)
-      EventUsers.create({:user_id => user.id, :event_id => event.id})
+      event.users << user unless event.users.exists?(user)
       return "You have registered for event: #{event.event_id} #{event.name}"
     end
 
     def call_unregister(params, method_params)
       user = User.find_or_create_by_phone({:phone=> params["from_number"]})
       event = Event.find_by_event_id(method_params)
-      EventUsers.delete()
+      event.users.delete(user)
       return "You have unregistered from event: #{event.event_id} #{event.name}"
     end
 
     def call_message(params, method_params)
       event_id, msg = method_params.split(" ", 2)
-      if Event.find_by_event_id(event_id).organizer.phone == params["from_number"]
-        #TODO: send message to event.users
-        return "Message sent: #{msg}"
+      event = Event.find_by_event_id(event_id)
+      return "Event #{event_id} does not exists" if event.nil? 
+
+      if event.organizer.phone == params["from_number"]
+        more = []
+        event.users.each do |user| 
+          more << {"content" => msg, "to_number" => user.phone.to_s}
+        end
+        return "Message sent: #{msg}", more
       else
         return "Only the event organizer can message the attendees"
       end
