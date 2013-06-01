@@ -1,5 +1,5 @@
 class Event < ActiveRecord::Base
-  attr_accessible :event_id, :name, :organizer
+  attr_accessible :event_id, :name, :organizer, :description
 
   validate :event_id, presence: true, uniqueness: true
 

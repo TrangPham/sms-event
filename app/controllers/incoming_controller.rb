@@ -4,10 +4,10 @@ class IncomingController < ApplicationController
     "register" => "register [event id]",
     "help" => "Available commands: register, create, unregister, message, status. Send 'help COMMAND' for more info",
     "unregister" => "Usage: 'unregister [event id]'",
-    "create" => "create [event name]",
+    "create" => "create [event name], [event info]",
     "message" => "message [event id] [message]",
     "cancel" => "cancel [event id]"
-  }
+    }
 
   def parse
     Rails.logger.info(params)
@@ -37,21 +37,41 @@ class IncomingController < ApplicationController
   end
 
   def call_create(params, method_params)
-    event = Event.create({:name => method_params, :organizer => User.find_or_create_by_phone({:phone=> params["from_number"]})})
-    return "Event created, register for event using 'register #{event.event_id}'"
+    name, info = method_params.split(",", 2)
+    event = Event.create({:name => name.strip!, :organizer => User.find_or_create_by_phone({:phone=> params["from_number"]})}, :description => info.strip!)
+    return "Event #{event.name} created, register for event using 'register #{event.event_id}'"
+  end
+
+  def call_update(params, method_params)
+    event_id, info = method_params.split(",", 2)
+    event = Event.find_by_event_id(event_id)
+    return "Event #{method_params} does not exist" if event.nil?
+
+    event.description = info.strip!
+    event.save
+    return "Event #{event.name} was updated"
+  end
+
+  def call_info(params, method_params)
+    event = Event.find_by_event_id(method_params)
+    return "Event #{method_params} does not exist" if event.nil?
+    return "#{event.name}(#{event.event_id}): #{event.description}"
   end
 
   def call_cancel(params, method_params)
     event = Event.find_by_event_id(method_params)
     return "Event #{method_params} does not exist" if event.nil?
 
+    msg = "Event #{event.name}(#{method_params}) was cancelled"
+    event.description = msg
+    event.save
     if event.organizer.phone == params["from_number"]
       #TODO: set event status to canceled
       more = []
       event.users.each do |user| 
-        more << {"content" => "Event #{method_params} #{event.name} was canceled", "to_number" => user.phone.to_s}
+        more << {"content" => msg, "to_number" => user.phone.to_s}
       end
-      return "Event #{method_params} #{event.name} canceled", more
+      return msg, more
     else
       return "Only the event organizer can message the attendees"
     end
@@ -61,7 +81,7 @@ class IncomingController < ApplicationController
     user = User.find_or_create_by_phone({:phone=> params["from_number"]})
     event = Event.find_by_event_id(method_params)
     event.users << user unless event.users.exists?(user)
-    return "You have registered for event: #{event.event_id} #{event.name}"
+    return "You have registered for event: #{event.name}(#{event.event_id})"
   end
 
   def call_unregister(params, method_params)
