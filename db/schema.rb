@@ -22,7 +22,7 @@ ActiveRecord::Schema.define(:version => 20130601185056) do
     t.integer  "event_id"
     t.string   "name"
     t.text     "description"
-    t.integer  "user_id"
+    t.integer  "organizer_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
