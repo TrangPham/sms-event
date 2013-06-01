@@ -3,9 +3,10 @@ class IncomingController < ApplicationController
   VALID_COMMANDS = {
     "register" => "register [event id]",
     "help" => "Available commands: register, create, unregister, message, status. Send 'help COMMAND' for more info",
-    "unregister" => "unregister [event id]",
+    "unregister" => "Usage: 'unregister [event id]'",
     "create" => "create [event name]",
-    "message" => "message [event id] [message]" 
+    "message" => "message [event id] [message]",
+    "cancel" => "cancel [event id]"
   }
 
   def parse
@@ -30,10 +31,6 @@ class IncomingController < ApplicationController
     to_return
   end
 
-  def call_hello(params, method_params)
-    "Goodbye #{method_params}"
-  end
-
   def call_help(params, method_params)
     return VALID_COMMANDS["help"] if method_params.blank?
     return if VALID_COMMANDS.keys.include?(method_params) ? VALID_COMMANDS[method_params] : "Sorry, #{method_params} is not a valid command"
@@ -42,6 +39,21 @@ class IncomingController < ApplicationController
   def call_create(params, method_params)
     event = Event.create({:name => method_params, :organizer => User.find_or_create_by_phone({:phone=> params["from_number"]})})
     return "Event created, register for event using 'register #{event.event_id}'"
+  end
+
+  def call_cancel(params, method_params)
+    event = Event.find_by_event_id(method_params)
+    return "Event #{method_params} does not exist" if event.nil?
+
+    if event.organizer.phone == params["from_number"]
+      more = []
+      event.users.each do |user| 
+        more << {"content" => "Event #{method_params} #{event.name} was canceled", "to_number" => user.phone.to_s}
+      end
+      return "Event #{method_params} #{event.name} canceled", more
+    else
+      return "Only the event organizer can message the attendees"
+    end
   end
 
   def call_register(params, method_params)
@@ -61,7 +73,7 @@ class IncomingController < ApplicationController
   def call_message(params, method_params)
     event_id, msg = method_params.split(" ", 2)
     event = Event.find_by_event_id(event_id)
-    return "Event #{event_id} does not exists" if event.nil? 
+    return "Event #{event_id} does not exist" if event.nil? 
 
     if event.organizer.phone == params["from_number"]
       more = []
