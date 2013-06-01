@@ -37,7 +37,7 @@ class IncomingController < ApplicationController
     end
 
     def call_create(params, method_params)
-      event = Event.create({:name => method_params, :organizer => User.find_or_create_by_phone({:phone=> params["from_number"]}))
+      event = Event.create({:name => method_params, :organizer => User.find_or_create_by_phone({:phone=> params["from_number"]})})
       return "Event created, register for event using 'register #{event.event_id}'"
     end
 
