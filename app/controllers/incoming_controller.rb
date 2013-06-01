@@ -1,16 +1,15 @@
-class IncommingController < ApplicationController
+class IncomingController < ApplicationController
 
   def parse
     Rails.logger.info(params)
 
-    method, method_params = params["content"].split(" ", 2)
     begin
-      object.send("call_#{method}".to_sym, params, method_params)
+      method, method_params = params["content"].split(" ", 2)
+      response = object.send("call_#{method}".to_sym, params, method_params)
+      render json: response
     rescue
-
+      render nothing: true, status: 200
     end
-
-    render nothing: true, status: 200
   end
 
   private
