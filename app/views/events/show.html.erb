@@ -6,7 +6,7 @@
 	  <p>There are no users currently registered for this event<p>
 	<% else %>
 	  <% @event.users.each do |c| %>
-	    <li>c.phone</li>
+      <li><%= c.phone %></li>
       <% end %>
     <% end %>
   </ul>
