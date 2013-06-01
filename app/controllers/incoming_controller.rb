@@ -17,7 +17,7 @@ class IncomingController < ApplicationController
 
     def sms_response(content, more = [])  
       to_return = {"messages" => [{"content" => content}]}
-      more.each do {|m| to_return["messages"] << m}
+      more.each{|m| to_return["messages"] << m}
       to_return
     end
 
