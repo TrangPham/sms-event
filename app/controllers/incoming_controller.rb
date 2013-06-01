@@ -6,14 +6,10 @@ class IncomingController < ApplicationController
     "unregister" => "Usage: 'unregister [event id]'",
     "create" => "create [event name], [event info]",
     "message" => "message [event id] [message]",
-<<<<<<< HEAD
-    "cancel" => "cancel [event id]"
-    }
-=======
     "cancel" => "cancel [event id]",
-    "info" => "info [event id]"
+    "info" => "info [event id]",
+    "settings" => "Usage: 'settings [toggle | on | off] [list]' Available Settings: talkback, broadcast, notify, confirm"
   }
->>>>>>> 0364f3a65ec7e37448339cf902d63b4f0a9249c6
 
   def parse
     Rails.logger.info(params)
@@ -58,12 +54,6 @@ class IncomingController < ApplicationController
     return "Event #{event.name} was updated"
   end
 
-  def call_info(params, method_params)
-    event = Event.find_by_event_id(method_params)
-    return "Event #{method_params} does not exist" if event.nil?
-    return "#{event.name}(#{event.event_id}): #{event.description}"
-  end
-
   def call_cancel(params, method_params)
     event = Event.find_by_event_id(method_params)
     return "Event #{method_params} does not exist" if event.nil?
@@ -87,7 +77,7 @@ class IncomingController < ApplicationController
     user = User.find_or_create_by_phone({:phone=> params["from_number"]})
     event = Event.find_by_event_id(method_params)
     event.users << user unless event.users.exists?(user)
-    return "You have registered for event: #{event.name}(#{event.event_id})"
+    return "Registered: #{event.name}(#{event.event_id}) Info: #{event.description}"
   end
 
   def call_unregister(params, method_params)
@@ -117,7 +107,7 @@ class IncomingController < ApplicationController
     event = Event.find_by_event_id(method_params)
     return "Event #{event_id} does not exist" if event.nil? 
     return "Event was cancelled" if event.status == "cancelled"
-    return  "ID: #{event.event_id} Name: #{event.name.titleize} Registered: #{event.users.count} Info:#{event.description}"    
+    return  "ID: #{event.event_id} Name: #{event.name.titleize} Registered: #{event.users.count} Info: #{event.description}"    
   end
 
 end
