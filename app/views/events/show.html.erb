@@ -1,10 +1,12 @@
 <% if @events.blank? %>
-<p>There are not any events currently in the system.</p>
+  <p>There are not events registered with this id.</p>
 <% else %>
-<p>These are no current events in our system</p>
-<ul id="events">
-	<% @event.users.each do |c| %>
-	<li>c.phone</li>
-<% end %>
-</ul>
+  <ul id="events">
+    <%if @event.users.count == 0 %>
+	  <p>There are no users currently registered for this event<p>
+	<% else %>
+	  <% @event.users.each do |c| %>
+	    <li>c.phone</li>
+    <% end %>
+  </ul>
 <% end %>
