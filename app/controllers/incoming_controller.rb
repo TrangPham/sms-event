@@ -37,13 +37,22 @@ class IncomingController < ApplicationController
     end
 
     def call_create(params, method_params)
-      event = Event.create({:name => method_params, User.find_or_create_by_phone({:phone=> params["from_number"]}))
+      event = Event.create({:name => method_params, :organizer => User.find_or_create_by_phone({:phone=> params["from_number"]}))
       return "Event created, register for event using 'register #{event.event_id}'"
     end
 
     def call_register(params, method_params)
       user = User.find_or_create_by_phone({:phone=> params["from_number"]})
       event = Event.find_by_event_id(method_params)
-      event.users.create(user)
+      EventUsers.create({:user_id => user.id, :event_id => event.id})
+    end
+
+    def call_unregister(params, method_params)
+    end
+
+    def call_message(params, method_params)
+    end
+
+    def call_status(params, method_params)
     end
 end
