@@ -1,12 +1,18 @@
 class IncomingController < ApplicationController
 
-  VALID_COMMANDS = %(help register create unregister message status)
+  VALID_COMMANDS = {
+    "register" => "register [event id]",
+    "help" => "Available commands: register, create, unregister, message, status. Send 'help COMMAND' for more info",
+    "unregister" => "unregister [event id]",
+    "create" => "create [event name]",
+    "message" => "message [event id] [message]" 
+  }
 
   def parse
     Rails.logger.info(params)
 
     method, method_params = params["content"].split(" ", 2)
-    if VALID_COMMANDS.include?(method)
+    if VALID_COMMANDS.keys.include?(method.downcase)
       content, more = send("call_#{method.downcase}".to_sym, params, method_params)
       render json: sms_response(content, more)
     else
@@ -29,16 +35,8 @@ class IncomingController < ApplicationController
   end
 
   def call_help(params, method_params)
-    case method_params
-    when nil
-      return "Available commands: register, create, unregister, message, status. Send 'help COMMAND' for more info"
-    when "register"
-      return "Register help text"
-    when "create"
-      return "create [event name]"
-    else
-      return "Sorry, #{method_params} is not a command"
-    end
+    return VALID_COMMANDS["help"] if method_params.blank?
+    return if VALID_COMMANDS.keys.include?(method_params) ? VALID_COMMANDS[method_params] : "Sorry, #{method_params} is not a valid command"
   end
 
   def call_create(params, method_params)
