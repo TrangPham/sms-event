@@ -45,12 +45,24 @@ class IncomingController < ApplicationController
       user = User.find_or_create_by_phone({:phone=> params["from_number"]})
       event = Event.find_by_event_id(method_params)
       EventUsers.create({:user_id => user.id, :event_id => event.id})
+      return "You have registered for event: #{event.event_id} #{event.name}"
     end
 
     def call_unregister(params, method_params)
+      user = User.find_or_create_by_phone({:phone=> params["from_number"]})
+      event = Event.find_by_event_id(method_params)
+      EventUsers.delete()
+      return "You have unregistered from event: #{event.event_id} #{event.name}"
     end
 
     def call_message(params, method_params)
+      event_id, msg = method_params.split(" ", 2)
+      if Event.find_by_event_id(event_id).organizer.phone == params["from_number"]
+        #TODO: send message to event.users
+        return "Message sent: #{msg}"
+      else
+        return "Only the event organizer can message the attendees"
+      end
     end
 
     def call_status(params, method_params)
