@@ -79,7 +79,7 @@ class IncomingController < ApplicationController
     if event.organizer.phone == params["from_number"]
       more = []
       event.users.each do |user| 
-        more << {"content" => msg, "to_number" => user.phone.to_s}
+        more << {"content" => "#{event.name}(#{event.id}): #{msg}", "to_number" => user.phone.to_s}
       end
       return "Message sent: #{msg}", more
     else
