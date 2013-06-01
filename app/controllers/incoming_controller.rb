@@ -5,7 +5,6 @@ class IncomingController < ApplicationController
 
     begin
       method, method_params = params["content"].split(" ", 2)
-      binding.pry
       response = send("call_#{method}".to_sym, params, method_params)
       render json: response
     rescue StandardError
