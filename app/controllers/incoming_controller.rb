@@ -1,5 +1,8 @@
 class IncomingController < ApplicationController
 
+  VALID_SETTINGS = {
+  	""
+  }
   VALID_COMMANDS = {
     "register" => "register [event id]",
     "help" => "Available commands: register, create, unregister, message, status. Send 'help COMMAND' for more info",
@@ -25,6 +28,17 @@ class IncomingController < ApplicationController
   end
 
   private
+
+  def call_settings(params, method_params)
+      toggle, list = method_params.split(" ", 2)
+      if toggle == "toggle"
+      	list.split(" ").each do |p| 
+
+          
+
+      end
+
+  	
 
   def sms_response(content, more)  
     more ||= []
