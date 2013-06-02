@@ -45,7 +45,7 @@ class IncomingController < ApplicationController
     return "Event #{event_code} does not exist" if event.nil? 
 
     return "Only event organizer can change settings" unless event.organizer.phone == params["from_number"]
-
+    
     mode = list.shift
     list = VALID_SETTINGS if mode == "show"
     msg = "Settings: "
@@ -58,6 +58,7 @@ class IncomingController < ApplicationController
       when "off"
         event.send("#{setting}=".to_sym, false)        
       end
+      event.save
       msg += " #{setting}"
       msg += event.send("#{setting}".to_sym) ? " on," : " off," 
     end

@@ -20,6 +20,7 @@ class IncomingControllerTest < ActionController::TestCase
   test "help command sends help settings message" do
     post :parse, make_response("help settings")
     assert_equal I18n.t("help.settings"), JSON.parse(response.body)["messages"][0]["content"], "help command help setting failed"
+  end
 
   #
   #  test "help command with args send specific help message"
@@ -49,6 +50,14 @@ class IncomingControllerTest < ActionController::TestCase
   #  test "info returns info message about event"
   #
   #  test "info throws error if invalid event_id"
+
+  test "settings on should turn on a setting" do
+    e = Event.create({:name => "party", :organizer => User.create({:phone => "6131234567"})})
+
+    post :parse, make_response("settings #{e.event_code} on talkback")
+
+    assert e.talkback
+  end
 
   private
 
