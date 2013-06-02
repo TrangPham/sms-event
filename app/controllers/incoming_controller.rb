@@ -149,7 +149,7 @@ class IncomingController < ApplicationController
     if event.broadcast or event.organizer.phone == params["from_number"]
       more = []
       event.users.each do |user| 
-        more << {"content" => "#{event.name}(#{event.id}): #{msg}", "to_number" => user.phone.to_s}
+        more << {"content" => "#{event.name}(#{event.event_code}): #{msg}", "to_number" => user.phone.to_s}
       end
       return "Message sent: #{msg}", more
     else
@@ -158,9 +158,9 @@ class IncomingController < ApplicationController
   end
 
   def call_info(params, method_params)
-    event = Event.find_by_event_id(method_params)
-    return "Event #{event_id} does not exist" if event.nil? 
-    return  "Name:  #{event.name}(#{event.event_id}) Registered: #{event.users.count} Info: #{event.description}"    
+    event = Event.find_by_event_code(method_params)
+    return "Event #{method_params} does not exist" if event.nil? 
+    return  "Name:  #{event.name}(#{event.event_code}) Registered: #{event.users.count} Info: #{event.description}"    
   end
 
 end
