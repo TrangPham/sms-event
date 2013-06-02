@@ -124,7 +124,7 @@ class IncomingController < ApplicationController
     more = nil
     unless event.users.exists?(user)
       event.users << user 
-      r = Registration.find.where({:user => user, :event => event})
+      r = Registration.select({:user => user, :event => event}).first
       msg = "User #{user.name} wants to register. Text 'confirm #{r.register_code}' to confirm" if event.confirm
       msg ||= "User #{user.name} has registered. Total Registered: #{event.users.count}" if event.notify
       more = [{"content" => msg, "to_number" => event.organizer.phone}] unless msg.blank?
@@ -137,8 +137,12 @@ class IncomingController < ApplicationController
   def call_unregister(params, method_params)
     user = User.find_or_create_by_phone({:phone=> params["from_number"]})
     event = Event.find_by_event_code(method_params)
-    event.users.delete(user)
-    return "You have unregistered from event: #{event.event_code} #{event.name}"
+    more = nil
+    unless event.users.include?(user)
+      event.users.delete(user)
+      more = [{"content" => "User #{user.name} unregistered for #{event.name}(#{event.event_code})", "to_number" => event.organizer.phone}] if notify
+    end
+    return "You have unregistered from event: #{event.event_code} #{event.name}", more
   end
 
   def call_message(params, method_params)
