@@ -14,7 +14,7 @@
 ActiveRecord::Schema.define(:version => 20130602000149) do
 
   create_table "events", :force => true do |t|
-    t.integer  "event_id"
+    t.integer  "event_code"
     t.string   "name"
     t.text     "description"
     t.integer  "organizer_id"
@@ -29,7 +29,7 @@ ActiveRecord::Schema.define(:version => 20130602000149) do
   create_table "registrations", :force => true do |t|
     t.integer "event_id"
     t.integer "user_id"
-    t.integer "register_id"
+    t.integer "register_code"
     t.boolean "confirmed"
   end
 

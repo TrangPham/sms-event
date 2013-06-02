@@ -1,19 +1,19 @@
 class Event < ActiveRecord::Base
-  attr_accessible :event_id, :name, :organizer, :description, :broadcast, :confirm, :notify, :talkback
+  attr_accessible :event_code, :name, :organizer, :description, :broadcast, :confirm, :notify, :talkback
 
-  validate :event_id, presence: true, uniqueness: true
+  validate :event_code, presence: true, uniqueness: true
 
-  before_create :set_event_id
+  before_create :set_event_code
   before_save :default_values
   belongs_to :organizer, :class_name => "User"
 
-  def set_event_id
-    _event_id = 0
+  def set_event_code
+    _event_code = 0
     while
-      _event_id = rand(0..9999)
-      break unless Event.find_by_event_id(_event_id)
+      _event_code = rand(0..9999)
+      break unless Event.find_by_event_code(_event_code)
     end
-    self.event_id = _event_id 
+    self.event_code = _event_code 
   end
 
   def default_values

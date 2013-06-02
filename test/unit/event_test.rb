@@ -8,7 +8,7 @@ class EventTest < ActiveSupport::TestCase
     assert_difference 'Event.count' do
       event = Event.create(name: 'test')
       assert event.valid?
-      assert event.event_id 
+      assert event.event_code 
     end
   end
 end

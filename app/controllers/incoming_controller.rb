@@ -29,7 +29,7 @@ class IncomingController < ApplicationController
   private
 
   def call_confirm(params, method_params)
-    reg = Registration.find_by_register_id(method_params)
+    reg = Registration.find_by_register_code(method_params)
     return "#{method_params} is not a valid registration code" if reg.nil?
 
     reg.confirmed = true
@@ -42,9 +42,9 @@ class IncomingController < ApplicationController
 
   def call_settings(params, method_params)
     list = method_params.split(" ")
-    event_id = list.shift
-    event = Event.find_by_event_id(event_id)
-    return "Event #{event_id} does not exist" if event.nil? 
+    event_code = list.shift
+    event = Event.find_by_event_code(event_code)
+    return "Event #{event_code} does not exist" if event.nil? 
 
     return "Only event organizer can change settings" unless event.organizer.phone == params["from_number"]
 
@@ -84,12 +84,12 @@ class IncomingController < ApplicationController
                          :organizer => User.find_or_create_by_phone({:phone=> params["from_number"]}),
                          :description => info.strip 
     })
-    return "Event #{event.name} created, register for event using 'register #{event.event_id}'"
+    return "Event #{event.name} created, register for event using 'register #{event.event_code}'"
   end
 
   def call_update(params, method_params)
-    event_id, info = method_params.split(",", 2)
-    event = Event.find_by_event_id(event_id)
+    event_code, info = method_params.split(",", 2)
+    event = Event.find_by_event_code(event_code)
     return "Event #{method_params} does not exist" if event.nil?
 
     event.description =  info.strip
@@ -98,7 +98,7 @@ class IncomingController < ApplicationController
   end
 
   def call_cancel(params, method_params)
-    event = Event.find_by_event_id(method_params)
+    event = Event.find_by_event_code(method_params)
     return "Event #{method_params} does not exist" if event.nil?
 
     msg = "Event #{event.name}(#{method_params}) was cancelled"
@@ -117,26 +117,26 @@ class IncomingController < ApplicationController
 
   def call_register(params, method_params)
     user = User.find_or_create_by_phone({:phone=> params["from_number"]})
-    event = Event.find_by_event_id(method_params)
+    event = Event.find_by_event_code(method_params)
     more = nil
     unless event.users.exists?(user)
       event.users << user 
       more = [{"content" => "A user has registered. Total Registered: #{event.users.count}", "to_number" => event.organizer.phone}] if event.notify
     end
-    return "Registered: #{event.name}(#{event.event_id}) Info: #{event.description}", more
+    return "Registered: #{event.name}(#{event.event_code}) Info: #{event.description}", more
   end
 
   def call_unregister(params, method_params)
     user = User.find_or_create_by_phone({:phone=> params["from_number"]})
-    event = Event.find_by_event_id(method_params)
+    event = Event.find_by_event_code(method_params)
     event.users.delete(user)
-    return "You have unregistered from event: #{event.event_id} #{event.name}"
+    return "You have unregistered from event: #{event.event_code} #{event.name}"
   end
 
   def call_message(params, method_params)
-    event_id, msg = method_params.split(" ", 2)
-    event = Event.find_by_event_id(event_id)
-    return "Event #{event_id} does not exist" if event.nil? 
+    event_code, msg = method_params.split(" ", 2)
+    event = Event.find_by_event_code(event_code)
+    return "Event #{event_code} does not exist" if event.nil? 
 
     if event.broadcast or event.organizer.phone == params["from_number"]
       more = []
@@ -150,9 +150,9 @@ class IncomingController < ApplicationController
   end
 
   def call_info(params, method_params)
-    event = Event.find_by_event_id(method_params)
-    return "Event #{event_id} does not exist" if event.nil? 
-    return  "#{event.name}(#{event.event_id}) Registered: #{event.users.count} Info: #{event.description}"    
+    event = Event.find_by_event_code(method_params)
+    return "Event #{event_code} does not exist" if event.nil? 
+    return  "#{event.name}(#{event.event_code}) Registered: #{event.users.count} Info: #{event.description}"    
   end
 
 end
