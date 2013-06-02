@@ -10,7 +10,7 @@ class IncomingController < ApplicationController
     "message" => "message [event id] [message]",
     "cancel" => "cancel [event id]",
     "info" => "info [event id]",
-    "settings" => "Usage: 'settings [toggle | on | off] [list]' Available Settings: #{VALID_SETTINGS}"
+    "settings" => "Usage: 'settings [event id] [toggle | on | off | show] [list]' Available Settings: #{VALID_SETTINGS}"
   }
 
   def parse
@@ -28,14 +28,29 @@ class IncomingController < ApplicationController
 
   private
 
+  def call_confirm(params, method_params)
+    reg = Registration.find_by_register_id(method_params)
+    return "#{method_params} is not a valid registration code" if reg.nil?
+
+    reg.confirmed = true
+    reg.save
+    return "#{reg.user.name} has been confirmed. They will now recieve event messages."
+  end
+
+  def call_talkback(params, method_params)
+  end
+
   def call_settings(params, method_params)
-    event_id = method_params[0]
+    list = method_params.split(" ")
+    event_id = list.shift
     event = Event.find_by_event_id(event_id)
     return "Event #{event_id} does not exist" if event.nil? 
 
     return "Only event organizer can change settings" unless event.organizer.phone == params["from_number"]
-    list = method_params.split(" ")
+
     mode = list.shift
+    list = VALID_SETTINGS if mode == "show"
+    msg = "Settings: "
     list.each do |setting|
       case mode
       when "toggle"
@@ -43,10 +58,12 @@ class IncomingController < ApplicationController
       when "on"
         event.send("#{setting}=".to_sym, true)
       when "off"
-        event.send("#{setting}=".to_sym, false)
-      else
+        event.send("#{setting}=".to_sym, false)        
       end
-    return "Settings updated"
+      msg += " #{setting}"
+      msg += event.send("#{setting}".to_sym) ? " on," : " off," 
+    end
+    return msg
   end
 
   def sms_response(content, more)  
@@ -135,9 +152,13 @@ class IncomingController < ApplicationController
   def call_info(params, method_params)
     event = Event.find_by_event_id(method_params)
     return "Event #{event_id} does not exist" if event.nil? 
+<<<<<<< HEAD
 
     return  "ID: #{event.name}(#{event.event_id}) Registered: #{event.users.count} Info: #{event.description}"    
 
+=======
+    return  "#{event.name}(#{event.event_id}) Registered: #{event.users.count} Info: #{event.description}"    
+>>>>>>> ed739f854ff2e8944388e8012285bc3b0ee1742c
   end
 
 end

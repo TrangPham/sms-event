@@ -22,9 +22,10 @@ class Event < ActiveRecord::Base
     self.notify ||= false
     self.talkback ||= false
     self.description ||= "no description"
-    seld.name ||= "no name"
+    self.name ||= "no name"
     true
   end
 
-  has_and_belongs_to_many :users
+  has_many :registrations
+  has_many :users, :through => :registrations
 end
