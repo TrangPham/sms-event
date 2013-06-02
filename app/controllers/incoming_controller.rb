@@ -152,13 +152,7 @@ class IncomingController < ApplicationController
   def call_info(params, method_params)
     event = Event.find_by_event_id(method_params)
     return "Event #{event_id} does not exist" if event.nil? 
-<<<<<<< HEAD
-
-    return  "ID: #{event.name}(#{event.event_id}) Registered: #{event.users.count} Info: #{event.description}"    
-
-=======
-    return  "#{event.name}(#{event.event_id}) Registered: #{event.users.count} Info: #{event.description}"    
->>>>>>> ed739f854ff2e8944388e8012285bc3b0ee1742c
+    return  "Name:  #{event.name}(#{event.event_id}) Registered: #{event.users.count} Info: #{event.description}"    
   end
 
 end
