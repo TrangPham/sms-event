@@ -154,8 +154,8 @@ class IncomingController < ApplicationController
       send_to = event.users.map(&:phone)
       send_to << event.organizer.phone unless from_organizer or send_to.include?(event.organizer)
       send_to.delete(params["from_number"])
-      send_to.each do |user| 
-        more << {"content" => "#{event.name}(#{event.event_code}): #{msg}", "to_number" => user.phone.to_s}
+      send_to.each do |phone| 
+        more << {"content" => "#{event.name}(#{event.event_code}): #{msg}", "to_number" => phone}
       end
       return "Message sent: #{msg}", more
     else
