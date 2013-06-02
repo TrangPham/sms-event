@@ -21,7 +21,8 @@ class Event < ActiveRecord::Base
     self.confirm ||= false
     self.notify ||= false
     self.talkback ||= false
-
+    self.description ||= "no description"
+    seld.name ||= "no name"
     true
   end
 
