@@ -50,7 +50,7 @@ class IncomingController < ApplicationController
 
     mode = list.shift
     list = VALID_SETTINGS if mode == "show"
-    msg = ""
+    msg = "Settings: "
     list.each do |setting|
       case mode
       when "toggle"
@@ -60,10 +60,10 @@ class IncomingController < ApplicationController
       when "off"
         event.send("#{setting}=".to_sym, false)        
       end
-      msg += "#{setting}"
-      msg += event.send("#{setting}".to_sym) ? " on, "
+      msg += " #{setting}"
+      msg += event.send("#{setting}".to_sym) ? " on," : " off," 
     end
-    return "Settings updated"
+    return msg
   end
 
   def sms_response(content, more)  
