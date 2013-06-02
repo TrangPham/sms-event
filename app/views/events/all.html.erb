@@ -1,0 +1,9 @@
+<% if @events.blank? %>
+  <p>There are not events.</p>
+<% else %>
+  <ul id="events">
+    <% @events.each do |e| %>
+      <li><%= link_to "#{e.name}", "events/#{e.event_code}" %></li>
+    <% end %>
+  </ul>
+<% end %>
