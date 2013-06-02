@@ -1,0 +1,10 @@
+fr:
+  commands:
+    register: "inscription"
+    help: "aide"
+    unregister: "désinscription"
+    create: "créer"
+    message: "message"
+    cancel: "annuler"
+    info: "info"
+    setting: "paramètre"
