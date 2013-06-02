@@ -33,60 +33,20 @@ class IncomingController < ApplicationController
     event = Event.find_by_event_id(event_id)
     return "Event #{event_id} does not exist" if event.nil? 
 
-    if event.organizer.phone == params["from_number"]
-      list = method_params.split(" ")
-      if list[0] == "toggle"
-        list.split(" ").each do |p| 
-          if VALID_SETTINGS.include?(p)
-            if p == VALID_SETTINGS[0]
-              event.talkback = !event.talkback
-            elsif p == VALID_SETTINGS[1]
-              event.broadcast = !event.broadcast
-            elsif p == VALID_SETTINGS[2]
-              event.notify = !event.notify
-            elsif p == VALID_SETTINGS[3]
-              event.confirm = !event.confirm
-            else
-              return "Invalid setting:  #{p} "
-            end
-          end
-        end
-      elsif list[0] == "on"
-        list.split(" ").each do |p| 
-          if VALID_SETTINGS.include?(p)
-            if p == VALID_SETTINGS[0]
-              event.talkback = true
-            elsif p == VALID_SETTINGS[1]
-              event.broadcast = true
-            elsif p == VALID_SETTINGS[2]
-              event.notify = true
-            elsif p == VALID_SETTINGS[3]
-              event.confirm = true
-            else
-              return "Invalid setting:  #{p} "
-            end
-          end
-        end
-      else list[0] == "off"
-        list.split(" ").each do |p| 
-          if VALID_SETTINGS.include?(p)
-            if p == VALID_SETTINGS[0]
-              event.talkback = false
-            elsif p == VALID_SETTINGS[1]
-              event.broadcast = false
-            elsif p == VALID_SETTINGS[2]
-              event.notify = false
-            elsif p == VALID_SETTINGS[3]
-              event.confirm = false
-            else
-              return "Invalid setting:  #{p} "
-            end
-          end
-        end
+    return "Only event organizer can change settings" unless event.organizer.phone == params["from_number"]
+    list = method_params.split(" ")
+    mode = list.shift
+    list.each do |setting|
+      case mode
+      when "toggle"
+        event.send("#{setting}=".to_sym, !event.setting)
+      when "on"
+        event.send("#{setting}=".to_sym, true)
+      when "off"
+        event.send("#{setting}=".to_sym, false)
+      else
       end
-    else
-      return "Invalid authorization"
-    end
+    return "Settings updated"
   end
 
   def sms_response(content, more)  
@@ -115,7 +75,7 @@ class IncomingController < ApplicationController
     event = Event.find_by_event_id(event_id)
     return "Event #{method_params} does not exist" if event.nil?
 
-    event.description = info.strip!
+    event.description =  info ? info.strip! : "no description"
     event.save
     return "Event #{event.name} was updated"
   end
