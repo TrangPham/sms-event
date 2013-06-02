@@ -92,12 +92,16 @@ class IncomingController < ApplicationController
 
   def call_update(params, method_params)
     event_code, info = method_params.split(",", 2)
+    return t('update.error') unless event_code && info
+
     event = Event.find_by_event_code(event_code)
-    return "Event #{method_params} does not exist" if event.nil?
+    return t('update.no_event', {event_id: event_code}) if event.nil?
+
+    return t('update.failed_auth') unless event.organizer.phone == params["from_number"]
 
     event.description =  info.strip
     event.save
-    return "Event #{event.name} was updated"
+    return t('update.response', {name: event.name, event_id: event.event_id})
   end
 
   def call_cancel(params, method_params)
@@ -124,7 +128,7 @@ class IncomingController < ApplicationController
     more = nil
     unless event.users.exists?(user)
       event.users << user 
-      r = Registration.select({:user => user, :event => event}).first
+      r = Registration.find.where({:user => user, :event => event})
       msg = "User #{user.name} wants to register. Text 'confirm #{r.register_code}' to confirm" if event.confirm
       msg ||= "User #{user.name} has registered. Total Registered: #{event.users.count}" if event.notify
       more = [{"content" => msg, "to_number" => event.organizer.phone}] unless msg.blank?
@@ -137,12 +141,8 @@ class IncomingController < ApplicationController
   def call_unregister(params, method_params)
     user = User.find_or_create_by_phone({:phone=> params["from_number"]})
     event = Event.find_by_event_code(method_params)
-    more = nil
-    unless event.users.include?(user)
-      event.users.delete(user)
-      more = [{"content" => "User #{user.name} unregistered for #{event.name}(#{event.event_code})", "to_number" => event.organizer.phone}] if notify
-    end
-    return "You have unregistered from event: #{event.event_code} #{event.name}", more
+    event.users.delete(user)
+    return "You have unregistered from event: #{event.event_code} #{event.name}"
   end
 
   def call_message(params, method_params)

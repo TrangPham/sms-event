@@ -17,6 +17,7 @@ en:
   confirm:
     response: "%{name} has been confirmed. They will now recieve messages."
     confirmation: "Registration confirmed for %{event_name}(%{event_code}). Info: %{info}"
+    error: "Requires event id and new description"
 
   create:
     response: "Event %{description} created. Register for event using 'register %{event_code}'"
@@ -37,4 +38,10 @@ en:
     cancel: "cancel [event id]"
     info: "info [event id]"
     settings: "Usage: 'settings [toggle | on | off] [list]' Available Settings: %{settings}"
+
+  update:
+    error: "You must supply an event_id and a new description"
+    failed_auth: "You must be event organizer to update an event"
+    no_event: "Event %{event_id} does not exist"
+    response: "Event %{name}(%{event_id}) was updated"
 

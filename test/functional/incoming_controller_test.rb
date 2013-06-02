@@ -25,9 +25,11 @@ class IncomingControllerTest < ActionController::TestCase
   end
 
   test "create command creates event and returns event id" do
-    post :parse, make_response("create")
-    @event = assigns(:event)
-    assert_equal I18n.t('create.response', { description: @event.description, event_code: @event.event_code }), text_answer(response)
+    assert_difference 'Event.count' do
+      post :parse, make_response("create")
+      @event = assigns(:event)
+      assert_equal I18n.t('create.response', { description: @event.description, event_code: @event.event_code }), text_answer(response)
+    end
   end
 
   test "update commands description" do
