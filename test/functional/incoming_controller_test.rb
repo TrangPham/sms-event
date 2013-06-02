@@ -19,7 +19,6 @@ class IncomingControllerTest < ActionController::TestCase
 
   test "help command sends help settings message" do
     post :parse, make_response("help settings")
-    binding.pry
     assert_equal I18n.t("help.settings"), JSON.parse(response.body)["messages"][0]["content"], "help command help setting failed"
   end
   #
