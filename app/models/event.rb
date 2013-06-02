@@ -21,6 +21,8 @@ class Event < ActiveRecord::Base
     self.confirm ||= false
     self.notify ||= false
     self.talkback ||= false
+
+    true
   end
 
   has_and_belongs_to_many :users
