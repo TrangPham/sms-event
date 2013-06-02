@@ -2,7 +2,7 @@ class IncomingController < ApplicationController
 
   VALID_SETTINGS = ["talkback", "broadcast", "notify", "confirm"]
 
-  VALID_COMMANDS = ["register", "help", "unregister", "create", "message", "cancel", "info", "settings", "confirm", "talkback"]
+  VALID_COMMANDS = ["register", "help", "unregister", "create", "message", "cancel", "info", "settings", "confirm", "talkbalk", "update"]
 
   def parse
     Rails.logger.info(params)
@@ -26,7 +26,7 @@ class IncomingController < ApplicationController
 
     reg.confirmed = true
     reg.save
-    return "#{reg.user.name} has been confirmed. They will now recieve event messages.", [{"content" => "Registration confirmed: #{event.name}(#{event.event_code}) Info: #{event.description}", "to_number" => reg.user.phone}]
+    return t('confirm.response', {name: reg.user.name}), [{"content" => t('confirm.confirmation', {event_name: event.name, event_code: event.event_code, info: event.info}), "to_number" => reg.user.phone}]
   end
 
   def call_talkback(params, method_params)
