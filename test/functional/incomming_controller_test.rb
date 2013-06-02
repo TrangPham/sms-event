@@ -3,14 +3,19 @@ require 'test_helper'
 class IncomingControllerTest < ActionController::TestCase
 
   def setup
+    I18n.locale = :en
   end
 
   test "invalid command sends error message" do
     post :parse, make_response("garbage")
     assert_response :ok
+    assert_equal " ", response.body
   end
 
-  #  test "help command sends help message"
+  test "help command sends help message" do
+    post :parse, make_response("help")
+    assert_equal I18n.t("help.help"), JSON.parse(response.body)["messages"][0]["content"]
+  end
   #
   #  test "help command with args send specific help message"
   #

@@ -2,4 +2,24 @@
 # See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
-  hello: "Hello world"
+  commands:
+    register: "register"
+    help: "help"
+    unregister: "unregister"
+    create: "create"
+    message: "message"
+    cancel: "cancel"
+    info: "info"
+    setting: "settings"
+  help:
+    register: "register [event id]"
+    help: "Available commands: register create unregister message status. Send 'help COMMAND' for more info"
+    unregister: "Usage: 'unregister [event id]'"
+    create: "create [event name] [event info]"
+    message: "message [event id] [message]"
+    cancel: "cancel [event id]"
+    info: "info [event id]"
+    settings: "Usage: 'settings [toggle | on | off] [list]' Available Settings: #{VALID_SETTINGS}"
+
+  errors:
+    invalid_help: "is not a valid command"

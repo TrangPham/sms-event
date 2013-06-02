@@ -2,22 +2,14 @@ class IncomingController < ApplicationController
 
   VALID_SETTINGS = ["talkback", "broadcast", "notify", "confirm"]
 
-  VALID_COMMANDS = {
-    "register" => "register [event id]",
-    "help" => "Available commands: register, create, unregister, message, status. Send 'help COMMAND' for more info",
-    "unregister" => "Usage: 'unregister [event id]'",
-    "create" => "create [event name], [event info]",
-    "message" => "message [event id] [message]",
-    "cancel" => "cancel [event id]",
-    "info" => "info [event id]",
-    "settings" => "Usage: 'settings [event id] [toggle | on | off | show] [list]' Available Settings: #{VALID_SETTINGS}"
-  }
+  VALID_COMMANDS = ["register", "help", "unregister", "create", "message", "cancel", "info", "settings"]
 
   def parse
     Rails.logger.info(params)
 
-    method, method_params = params["content"].split(" ", 2)
-    if VALID_COMMANDS.keys.include?(method.downcase)
+    command, method_params = params["content"].split(" ", 2)
+    if t('commands').values.include?(command.downcase)
+      method = t('commands').invert[command]
       content, more = send("call_#{method.downcase}".to_sym, params, method_params)
       render json: sms_response(content, more)
     else
@@ -74,8 +66,8 @@ class IncomingController < ApplicationController
   end
 
   def call_help(params, method_params)
-    return VALID_COMMANDS["help"] if method_params.blank?
-    return if VALID_COMMANDS.keys.include?(method_params) ? VALID_COMMANDS[method_params] : "Sorry, #{method_params} is not a valid command"
+    return t("help.help") if method_params.blank?
+    return if t("help").keys.include?(method_params) ? t("help.#{method_params}") : "#{method_params} #{t('errors.invalid_help')}"
   end
 
   def call_create(params, method_params)
