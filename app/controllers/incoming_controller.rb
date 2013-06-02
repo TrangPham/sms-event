@@ -2,7 +2,7 @@ class IncomingController < ApplicationController
 
   VALID_SETTINGS = ["talkback", "broadcast", "notify", "confirm"]
 
-  VALID_COMMANDS = ["register", "help", "unregister", "create", "message", "cancel", "info", "settings"]
+  VALID_COMMANDS = ["register", "help", "unregister", "create", "message", "cancel", "info", "settings", "confirm", "reply"]
 
   def parse
     Rails.logger.info(params)
@@ -30,6 +30,12 @@ class IncomingController < ApplicationController
   end
 
   def call_talkback(params, method_params)
+    event_code, msg = method_params.split(" ", 2)
+    event = Event.find_by_event_code(event_code)
+    return "Event #{event_code} does not exist" if event.nil? 
+    return "Event organizer has opted not to recieve messages from attendees." unless event.talkback
+
+    return "Message sent to organizer.", [{"content" => msg, "to_number" => event.organizer.phone}]
   end
 
   def call_settings(params, method_params)
