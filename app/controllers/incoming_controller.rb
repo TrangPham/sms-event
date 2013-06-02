@@ -9,8 +9,8 @@ class IncomingController < ApplicationController
 
     command, method_params = params["content"].split(" ", 2)
     if t('commands').values.include?(command.downcase)
-      method = t('commands').invert[command]
-      content, more = send("call_#{method.downcase}".to_sym, params, method_params)
+      method = t('commands').invert[command.downcase]
+      content, more = send("call_#{method}".to_sym, params, method_params)
       render json: sms_response(content, more)
     else
       Rails.logger.info("invalid, try again")
