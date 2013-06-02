@@ -29,6 +29,7 @@ class IncomingControllerTest < ActionController::TestCase
     @event = assigns(:event)
     assert_equal I18n.t('create.response', { description: @event.description, event_code: @event.event_code }), text_answer(response)
   end
+
   #
   #  test "register command registers you for event if valid event_id"
   #
