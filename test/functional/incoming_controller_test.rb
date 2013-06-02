@@ -25,15 +25,25 @@ class IncomingControllerTest < ActionController::TestCase
   end
 
   test "create command creates event and returns event id" do
-    post :parse, make_response("create")
-    @event = assigns(:event)
-    assert_equal I18n.t('create.response', { description: @event.description, event_code: @event.event_code }), text_answer(response)
+    assert_difference 'Event.count' do
+      post :parse, make_response("create")
+      @event = assigns(:event)
+      assert_equal I18n.t('create.response', { description: @event.description, event_code: @event.event_code }), text_answer(response)
+    end
   end
 
+<<<<<<< HEAD
+  test "register command registers you for event if valid event_id" do
+    post :parse, make_response("register 1")
+    puts "#{response.body}"
+  end
+
+=======
   test "update commands description" do
     binding.pry
     post :parse, make_response("update")
   end
+>>>>>>> 3367abae8d2c535da7b1a03f61268493600dbbf2
   #
   #  test "register command registers you for event if valid event_id"
   #

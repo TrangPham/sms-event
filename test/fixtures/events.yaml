@@ -1,8 +1,13 @@
+<<<<<<< HEAD:test/fixtures/events.yaml
+test1
+  event_id: 0
+=======
 test1:
+>>>>>>> 3367abae8d2c535da7b1a03f61268493600dbbf2:test/fixtures/events.yml
   event_code: 1
   name:       testEvent
   description:  none
-  organizer_id: none
+  organizer_id: 0
   created_at: <%= Time.now %>
   updated_at: <%= Time.now %>
   talkback:  false

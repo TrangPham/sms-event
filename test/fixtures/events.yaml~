@@ -1,0 +1,11 @@
+test1
+  event_code: 1
+  name:       testEvent
+  description:  none
+  organizer_id: none
+  created_at: <%= Time.now %>
+  updated_at: <%= Time.now %>
+  talkback:  false
+  broadcast:  false
+  notify: false
+  confirm: false
