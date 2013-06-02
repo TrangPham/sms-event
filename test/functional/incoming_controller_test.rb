@@ -32,10 +32,18 @@ class IncomingControllerTest < ActionController::TestCase
     end
   end
 
+<<<<<<< HEAD
+  test "register command registers you for event if valid event_id" do
+    post :parse, make_response("register 1")
+    puts "#{response.body}"
+  end
+
+=======
   test "update commands description" do
     binding.pry
     post :parse, make_response("update")
   end
+>>>>>>> 3367abae8d2c535da7b1a03f61268493600dbbf2
   #
   #  test "register command registers you for event if valid event_id"
   #
