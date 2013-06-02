@@ -10,7 +10,7 @@ class IncomingController < ApplicationController
     "message" => "message [event id] [message]",
     "cancel" => "cancel [event id]",
     "info" => "info [event id]",
-    "settings" => "Usage: 'settings [toggle | on | off] [list]' Available Settings: #{VALID_SETTINGS}"
+    "settings" => "Usage: 'settings [event id] [toggle | on | off] [list]' Available Settings: #{VALID_SETTINGS}"
   }
 
   def parse
@@ -29,12 +29,13 @@ class IncomingController < ApplicationController
   private
 
   def call_settings(params, method_params)
-    event_id = method_params[0]
+    list = method_params.split(" ")
+    event_id = list.shift
     event = Event.find_by_event_id(event_id)
     return "Event #{event_id} does not exist" if event.nil? 
 
     return "Only event organizer can change settings" unless event.organizer.phone == params["from_number"]
-    list = method_params.split(" ")
+    
     mode = list.shift
     list.each do |setting|
       case mode
@@ -135,7 +136,7 @@ class IncomingController < ApplicationController
   def call_info(params, method_params)
     event = Event.find_by_event_id(method_params)
     return "Event #{event_id} does not exist" if event.nil? 
-    return  "ID: #{event.name}(#{event.event_id}) Registered: #{event.users.count} Info: #{event.description}"    
+    return  "#{event.name}(#{event.event_id}) Registered: #{event.users.count} Info: #{event.description}"    
   end
 
 end
