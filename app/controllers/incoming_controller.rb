@@ -34,7 +34,7 @@ class IncomingController < ApplicationController
 
     reg.confirmed = true
     reg.save
-    return "#{reg.user.name} has been confirmed. They will now recieve event messages."
+    return "#{reg.user.name} has been confirmed. They will now recieve event messages.", [{"content" => "Registration confirmed: #{event.name}(#{event.event_code}) Info: #{event.description}", "to_number" => reg.user.phone}]
   end
 
   def call_talkback(params, method_params)
@@ -121,9 +121,13 @@ class IncomingController < ApplicationController
     more = nil
     unless event.users.exists?(user)
       event.users << user 
-      more = [{"content" => "A user has registered. Total Registered: #{event.users.count}", "to_number" => event.organizer.phone}] if event.notify
+      msg = "User #{user.name wants to register. Text 'confirm #{r.register_code}' to confirm}" if event.confirm
+      msg ||= "User #{user.name} has registered. Total Registered: #{event.users.count}" if event.notify
+      more = [{"content" => msg, "to_number" => event.organizer.phone}] unless msg.blank?
     end
-    return "Registered: #{event.name}(#{event.event_code}) Info: #{event.description}", more
+    msg = "You will recieve a notification when the organizer has confirmed your registration." if event.confirm
+    msg ||= "Registered: #{event.name}(#{event.event_code}) Info: #{event.description}"
+    return msg, more
   end
 
   def call_unregister(params, method_params)
