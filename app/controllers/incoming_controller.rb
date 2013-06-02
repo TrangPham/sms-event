@@ -48,8 +48,9 @@ class IncomingController < ApplicationController
 
     mode = list.shift
     list = VALID_SETTINGS if mode == "show"
-    msg = "Settings: "
+    msg = "Settings #{event.event_code}:"
     list.each do |setting|
+      setting.strip!
       case mode
       when "toggle"
         event.send("#{setting}=".to_sym, !event.setting)
@@ -58,6 +59,7 @@ class IncomingController < ApplicationController
       when "off"
         event.send("#{setting}=".to_sym, false)        
       end
+      event.save
       msg += " #{setting}"
       msg += event.send("#{setting}".to_sym) ? " on," : " off," 
     end
@@ -77,12 +79,15 @@ class IncomingController < ApplicationController
   end
 
   def call_create(params, method_params)
+    method_params ||= ""
     name, info = method_params.split(",", 2)
-    event = Event.create({:name => name.strip,
+    name.strip! if name
+    info.strip! if info
+    @event = Event.create({:name => name,
                          :organizer => User.find_or_create_by_phone({:phone=> params["from_number"]}),
-                         :description => info.strip 
+                         :description => info
     })
-    return "Event #{event.name} created, register for event using 'register #{event.event_code}'"
+    return t('create.response', { description: @event.description, event_code: @event.event_code })
   end
 
   def call_update(params, method_params)
@@ -144,7 +149,7 @@ class IncomingController < ApplicationController
     if event.broadcast or event.organizer.phone == params["from_number"]
       more = []
       event.users.each do |user| 
-        more << {"content" => "#{event.name}(#{event.id}): #{msg}", "to_number" => user.phone.to_s}
+        more << {"content" => "#{event.name}(#{event.event_code}): #{msg}", "to_number" => user.phone.to_s}
       end
       return "Message sent: #{msg}", more
     else
@@ -153,9 +158,9 @@ class IncomingController < ApplicationController
   end
 
   def call_info(params, method_params)
-    event = Event.find_by_event_id(method_params)
-    return "Event #{event_id} does not exist" if event.nil? 
-    return  "Name:  #{event.name}(#{event.event_id}) Registered: #{event.users.count} Info: #{event.description}"    
+    event = Event.find_by_event_code(method_params)
+    return "Event #{method_params} does not exist" if event.nil? 
+    return  "Name:  #{event.name}(#{event.event_code}) Registered: #{event.users.count} Info: #{event.description}"    
   end
 
 end

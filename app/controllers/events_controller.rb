@@ -7,5 +7,10 @@ class EventsController < ApplicationController
     render 'events/show'
   end
 
+  def all
+    @events = Event.all
+    render 'events/all'
+  end
+
 
 end

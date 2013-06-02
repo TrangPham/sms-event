@@ -19,7 +19,11 @@ en:
     message: "message [event id] [message]"
     cancel: "cancel [event id]"
     info: "info [event id]"
-    settings: "Usage: 'settings [toggle | on | off] [list]' Available Settings: #{VALID_SETTINGS}"
-
+    settings: "Usage: 'settings [toggle | on | off] [list]' Available Settings: %{settings}"
   errors:
     invalid_help: "is not a valid command"
+  events:
+    default_name: "No name"
+    default_description: "No description"
+  create:
+    response: "Event %{description} created. Register for event using 'register %{event_code}'"
