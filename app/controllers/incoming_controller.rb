@@ -169,4 +169,5 @@ class IncomingController < ApplicationController
     return  "Name:  #{event.name}(#{event.event_code}) Registered: #{event.users.count} Info: #{event.description}"    
   end
 
+
 end
