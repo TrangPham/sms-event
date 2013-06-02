@@ -10,7 +10,7 @@ en:
     message: "message"
     cancel: "cancel"
     info: "info"
-    setting: "settings"
+    settings: "settings"
   help:
     register: "register [event id]"
     help: "Available commands: register create unregister message status. Send 'help COMMAND' for more info"

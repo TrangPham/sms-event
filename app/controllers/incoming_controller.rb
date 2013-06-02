@@ -73,7 +73,7 @@ class IncomingController < ApplicationController
 
   def call_help(params, method_params)
     return t("help.help") if method_params.blank?
-    return if t("help").keys.include?(method_params) ? t("help.#{method_params}") : "#{method_params} #{t('errors.invalid_help')}"
+    return t("help").keys.include?(method_params.to_sym) ? t("help.#{method_params}") : "#{method_params} #{t('errors.invalid_help')}"
   end
 
   def call_create(params, method_params)
