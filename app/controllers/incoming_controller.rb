@@ -175,7 +175,7 @@ class IncomingController < ApplicationController
   def call_info(params, method_params)
     event = Event.find_by_event_id(method_params)
     return "Event #{event_id} does not exist" if event.nil? 
-    return "Event was cancelled" if event.status == "cancelled"
+    return "Event was cancelled" if event.info == "cancelled"
     return  "ID: #{event.event_id} Name: #{event.name.titleize} Registered: #{event.users.count} Info: #{event.description}"    
   end
 
