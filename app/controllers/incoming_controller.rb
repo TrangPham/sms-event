@@ -114,7 +114,7 @@ class IncomingController < ApplicationController
     unless event.users.exists?(user)
       event.users << user 
       r = Registration.find.where({:user => user, :event => event})
-      msg = "User #{user.name wants to register. Text 'confirm #{r.register_code}' to confirm}" if event.confirm
+      msg = "User #{user.name} wants to register. Text 'confirm #{r.register_code}' to confirm" if event.confirm
       msg ||= "User #{user.name} has registered. Total Registered: #{event.users.count}" if event.notify
       more = [{"content" => msg, "to_number" => event.organizer.phone}] unless msg.blank?
     end
