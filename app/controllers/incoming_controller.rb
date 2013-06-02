@@ -1,8 +1,6 @@
 class IncomingController < ApplicationController
 
-
   VALID_SETTINGS = ["talkback", "broadcast", "notify", "confirm"]
-
 
   VALID_COMMANDS = {
     "register" => "register [event id]",
@@ -31,76 +29,65 @@ class IncomingController < ApplicationController
   private
 
   def call_settings(params, method_params)
-  	event_id = method_params[0]
-  	event = Event.find_by_event_id(event_id)
+    event_id = method_params[0]
+    event = Event.find_by_event_id(event_id)
     return "Event #{event_id} does not exist" if event.nil? 
 
     if event.organizer.phone == params["from_number"]
       list = method_params.split(" ")
       if list[0] == "toggle"
-      	 list.split(" ").each do |p| 
-      	   if VALID_SETTINGS.include?(p)
-      	     if p == VALID_SETTINGS[0]
-      	       event.talkback = !event.talkback
-      	     elsif p == VALID_SETTINGS[1]
-      	   	   event.broadcast = !event.broadcast
-      	     elsif p == VALID_SETTINGS[2]
-      	       event.notify = !event.notify
-      	     elsif p == VALID_SETTINGS[3]
-        	   event.confirm = !event.confirm
-      	     else
-      	       return "Invalid setting:  #{p} "
-      	     end
-           end
-         end
-      elsif list[0] == "on"
-      	list.split(" ").each do |p| 
-      	   if VALID_SETTINGS.include?(p)
-      	     if p == VALID_SETTINGS[0]
-      	       event.talkback = true
-      	     elsif p == VALID_SETTINGS[1]
-      	   	   event.broadcast = true
-      	     elsif p == VALID_SETTINGS[2]
-      	       event.notify = true
-      	     elsif p == VALID_SETTINGS[3]
-        	   event.confirm = true
-      	     else
-      	       return "Invalid setting:  #{p} "
-      	     end
-           end
-
+        list.split(" ").each do |p| 
+          if VALID_SETTINGS.include?(p)
+            if p == VALID_SETTINGS[0]
+              event.talkback = !event.talkback
+            elsif p == VALID_SETTINGS[1]
+              event.broadcast = !event.broadcast
+            elsif p == VALID_SETTINGS[2]
+              event.notify = !event.notify
+            elsif p == VALID_SETTINGS[3]
+              event.confirm = !event.confirm
+            else
+              return "Invalid setting:  #{p} "
+            end
+          end
         end
-       else list[0] == "off"
-       	list.split(" ").each do |p| 
-      	   if VALID_SETTINGS.include?(p)
-      	     if p == VALID_SETTINGS[0]
-      	       event.talkback = false
-      	     elsif p == VALID_SETTINGS[1]
-      	   	   event.broadcast = false
-      	     elsif p == VALID_SETTINGS[2]
-      	       event.notify = false
-      	     elsif p == VALID_SETTINGS[3]
-        	   event.confirm = false
-      	     else
-      	       return "Invalid setting:  #{p} "
-      	     end
-           end
-         end
-       end
-    else
-    	return "Invalid authorization"
-    end
-
-  end
-  
-
-
-
-          
-
+      elsif list[0] == "on"
+        list.split(" ").each do |p| 
+          if VALID_SETTINGS.include?(p)
+            if p == VALID_SETTINGS[0]
+              event.talkback = true
+            elsif p == VALID_SETTINGS[1]
+              event.broadcast = true
+            elsif p == VALID_SETTINGS[2]
+              event.notify = true
+            elsif p == VALID_SETTINGS[3]
+              event.confirm = true
+            else
+              return "Invalid setting:  #{p} "
+            end
+          end
+        end
+      else list[0] == "off"
+        list.split(" ").each do |p| 
+          if VALID_SETTINGS.include?(p)
+            if p == VALID_SETTINGS[0]
+              event.talkback = false
+            elsif p == VALID_SETTINGS[1]
+              event.broadcast = false
+            elsif p == VALID_SETTINGS[2]
+              event.notify = false
+            elsif p == VALID_SETTINGS[3]
+              event.confirm = false
+            else
+              return "Invalid setting:  #{p} "
+            end
+          end
+        end
       end
-
-  	
+    else
+      return "Invalid authorization"
+    end
+  end
 
   def sms_response(content, more)  
     more ||= []
@@ -116,7 +103,10 @@ class IncomingController < ApplicationController
 
   def call_create(params, method_params)
     name, info = method_params.split(",", 2)
-    event = Event.create({:name => name.strip!, :organizer => User.find_or_create_by_phone({:phone=> params["from_number"]})}, :description => info.strip!)
+    event = Event.create({:name => name.strip!,
+                         :organizer => User.find_or_create_by_phone({:phone=> params["from_number"]}),
+                         :description => info ? info.strip! : "no description"
+    })
     return "Event #{event.name} created, register for event using 'register #{event.event_id}'"
   end
 
