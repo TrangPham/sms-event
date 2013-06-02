@@ -10,7 +10,7 @@ class IncomingController < ApplicationController
     "message" => "message [event id] [message]",
     "cancel" => "cancel [event id]",
     "info" => "info [event id]",
-    "settings" => "Usage: 'settings [event id] [toggle | on | off] [list]' Available Settings: #{VALID_SETTINGS}"
+    "settings" => "Usage: 'settings [event id] [toggle | on | off | show] [list]' Available Settings: #{VALID_SETTINGS}"
   }
 
   def parse
@@ -28,6 +28,18 @@ class IncomingController < ApplicationController
 
   private
 
+  def call_confirm(params, method_params)
+    reg = Registration.find_by_register_id(method_params)
+    return "#{method_params} is not a valid registration code" if reg.nil?
+
+    reg.confirmed = true
+    reg.save
+    return "#{reg.user.name} has been confirmed. They will now recieve event messages."
+  end
+
+  def call_talkback(params, method_params)
+  end
+
   def call_settings(params, method_params)
     list = method_params.split(" ")
     event_id = list.shift
@@ -35,8 +47,10 @@ class IncomingController < ApplicationController
     return "Event #{event_id} does not exist" if event.nil? 
 
     return "Only event organizer can change settings" unless event.organizer.phone == params["from_number"]
-    
+
     mode = list.shift
+    list = VALID_SETTINGS if mode == "show"
+    msg = ""
     list.each do |setting|
       case mode
       when "toggle"
@@ -44,9 +58,11 @@ class IncomingController < ApplicationController
       when "on"
         event.send("#{setting}=".to_sym, true)
       when "off"
-        event.send("#{setting}=".to_sym, false)
-      else
+        event.send("#{setting}=".to_sym, false)        
       end
+      msg += "#{setting}"
+      msg += event.send("#{setting}".to_sym) ? " on, "
+    end
     return "Settings updated"
   end
 

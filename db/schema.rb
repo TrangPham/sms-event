@@ -26,13 +26,16 @@ ActiveRecord::Schema.define(:version => 20130602000149) do
     t.boolean  "confirm"
   end
 
-  create_table "events_users", :force => true do |t|
+  create_table "registrations", :force => true do |t|
     t.integer "event_id"
     t.integer "user_id"
+    t.integer "register_id"
+    t.boolean "confirmed"
   end
 
   create_table "users", :force => true do |t|
     t.string   "phone"
+    t.string   "name"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
