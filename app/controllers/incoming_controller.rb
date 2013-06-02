@@ -63,9 +63,9 @@ class IncomingController < ApplicationController
 
   def call_create(params, method_params)
     name, info = method_params.split(",", 2)
-    event = Event.create({:name => name.strip!,
+    event = Event.create({:name => name.strip,
                          :organizer => User.find_or_create_by_phone({:phone=> params["from_number"]}),
-                         :description => info ? info.strip! : "no description"
+                         :description => info.strip 
     })
     return "Event #{event.name} created, register for event using 'register #{event.event_id}'"
   end
@@ -75,7 +75,7 @@ class IncomingController < ApplicationController
     event = Event.find_by_event_id(event_id)
     return "Event #{method_params} does not exist" if event.nil?
 
-    event.description =  info ? info.strip! : "no description"
+    event.description =  info.strip
     event.save
     return "Event #{event.name} was updated"
   end
@@ -135,8 +135,7 @@ class IncomingController < ApplicationController
   def call_info(params, method_params)
     event = Event.find_by_event_id(method_params)
     return "Event #{event_id} does not exist" if event.nil? 
-    #return "Event was cancelled" if event.info == "cancelled"
-    return  "ID: #{event.event_id} Registered: #{event.users.count} Info: #{event.description}"    
+    return  "ID: #{event.name}(#{event.event_id}) Registered: #{event.users.count} Info: #{event.description}"    
   end
 
 end
