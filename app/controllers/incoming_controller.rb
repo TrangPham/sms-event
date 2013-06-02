@@ -79,12 +79,15 @@ class IncomingController < ApplicationController
   end
 
   def call_create(params, method_params)
+    method_params ||= ""
     name, info = method_params.split(",", 2)
-    event = Event.create({:name => name.strip,
+    name.strip! if name
+    info.strip! if info
+    @event = Event.create({:name => name,
                          :organizer => User.find_or_create_by_phone({:phone=> params["from_number"]}),
-                         :description => info.strip 
+                         :description => info
     })
-    return "Event #{event.name} created, register for event using 'register #{event.event_code}'"
+    return t('create.response', { description: @event.description, event_code: @event.event_code })
   end
 
   def call_update(params, method_params)

@@ -14,18 +14,20 @@ class IncomingControllerTest < ActionController::TestCase
 
   test "help command sends help message" do
     post :parse, make_response("help")
-    assert_equal I18n.t("help.help"), JSON.parse(response.body)["messages"][0]["content"]
+    assert_equal I18n.t("help.help"), text_answer(response)
   end
 
   test "help command sends help settings message" do
     post :parse, make_response("help settings")
-    assert_equal I18n.t("help.settings"), JSON.parse(response.body)["messages"][0]["content"], "help command help setting failed"
+
+    assert_equal I18n.t("help.settings"), text_answer(response)
   end
 
-  #
-  #  test "help command with args send specific help message"
-  #
-  #  test "create command creates event and returns event id"
+  test "create command creates event and returns event id" do
+    post :parse, make_response("create")
+    @event = assigns(:event)
+    assert_equal I18n.t('create.response', { description: @event.description, event_code: @event.event_code }), text_answer(response)
+  end
   #
   #  test "register command registers you for event if valid event_id"
   #
@@ -56,7 +58,7 @@ class IncomingControllerTest < ActionController::TestCase
 
     post :parse, make_response("settings #{e.event_code} on talkback")
     e.reload
-    assert e.talkback, "event_code #{e.event_code} call_settings returnt #{JSON.parse(response.body)["messages"][0]["content"]}"
+    assert e.talkback, "event_code #{e.event_code} call_settings returnt #{text_answer(response)}"
   end
 
   private
@@ -78,5 +80,9 @@ class IncomingControllerTest < ActionController::TestCase
       "action"=>"parse",
       "controller"=>"incoming"
     }
+  end
+
+  def text_answer(response)
+    JSON.parse(response.body)["messages"][0]["content"]
   end
 end
