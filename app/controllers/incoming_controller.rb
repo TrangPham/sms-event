@@ -94,7 +94,7 @@ class IncomingController < ApplicationController
       end
       return msg, more
     else
-      return "Only the event organizer can message the attendees"
+      return "Only the event organizer can cancel the event"
     end
   end
 
