@@ -45,11 +45,12 @@ class IncomingController < ApplicationController
     return "Event #{event_code} does not exist" if event.nil? 
 
     return "Only event organizer can change settings" unless event.organizer.phone == params["from_number"]
-    
+
     mode = list.shift
     list = VALID_SETTINGS if mode == "show"
-    msg = "Settings: "
+    msg = "Settings #{event.event_code}:"
     list.each do |setting|
+      setting.strip!
       case mode
       when "toggle"
         event.send("#{setting}=".to_sym, !event.setting)

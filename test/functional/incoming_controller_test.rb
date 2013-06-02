@@ -52,11 +52,11 @@ class IncomingControllerTest < ActionController::TestCase
   #  test "info throws error if invalid event_id"
 
   test "settings on should turn on a setting" do
-    e = Event.create({:name => "party", :organizer => User.create({:phone => "6131234567"})})
+    e = Event.create({:name => "party", :organizer => User.create({:phone => "5551234"})})
 
     post :parse, make_response("settings #{e.event_code} on talkback")
-
-    assert e.talkback
+    e.reload
+    assert e.talkback, "event_code #{e.event_code} call_settings returnt #{JSON.parse(response.body)["messages"][0]["content"]}"
   end
 
   private
