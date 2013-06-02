@@ -2,7 +2,7 @@ class IncomingController < ApplicationController
 
   VALID_SETTINGS = ["talkback", "broadcast", "notify", "confirm"]
 
-  VALID_COMMANDS = ["register", "help", "unregister", "create", "message", "cancel", "info", "settings", "confirm", "reply"]
+  VALID_COMMANDS = ["register", "help", "unregister", "create", "message", "cancel", "info", "settings", "confirm", "talkbalk", "update"]
 
   def parse
     Rails.logger.info(params)
@@ -26,7 +26,7 @@ class IncomingController < ApplicationController
 
     reg.confirmed = true
     reg.save
-    return "#{reg.user.name} has been confirmed. They will now recieve event messages.", [{"content" => "Registration confirmed: #{event.name}(#{event.event_code}) Info: #{event.description}", "to_number" => reg.user.phone}]
+    return t('confirm.response', {name: reg.user.name}), [{"content" => t('confirm.confirmation', {event_name: event.name, event_code: event.event_code, info: event.info}), "to_number" => reg.user.phone}]
   end
 
   def call_talkback(params, method_params)
@@ -124,7 +124,7 @@ class IncomingController < ApplicationController
     more = nil
     unless event.users.exists?(user)
       event.users << user 
-      r = Registration.find.where({:user => user, :event => event})
+      r = Registration.select({:user => user, :event => event}).first
       msg = "User #{user.name} wants to register. Text 'confirm #{r.register_code}' to confirm" if event.confirm
       msg ||= "User #{user.name} has registered. Total Registered: #{event.users.count}" if event.notify
       more = [{"content" => msg, "to_number" => event.organizer.phone}] unless msg.blank?
@@ -137,18 +137,25 @@ class IncomingController < ApplicationController
   def call_unregister(params, method_params)
     user = User.find_or_create_by_phone({:phone=> params["from_number"]})
     event = Event.find_by_event_code(method_params)
-    event.users.delete(user)
-    return "You have unregistered from event: #{event.event_code} #{event.name}"
+    more = nil
+    unless event.users.include?(user)
+      event.users.delete(user)
+      more = [{"content" => "User #{user.name} unregistered for #{event.name}(#{event.event_code})", "to_number" => event.organizer.phone}] if notify
+    end
+    return "You have unregistered from event: #{event.event_code} #{event.name}", more
   end
 
   def call_message(params, method_params)
     event_code, msg = method_params.split(" ", 2)
     event = Event.find_by_event_code(event_code)
     return "Event #{event_code} does not exist" if event.nil? 
-
-    if event.broadcast or event.organizer.phone == params["from_number"]
+    from_organizer = event.organizer.phone == params["from_number"]
+    if event.broadcast or from_organizer
       more = []
-      event.users.each do |user| 
+      send_to = event.users
+      send_to << event.organizer unless from_organizer or send_to.include?(event.organizer)
+      send_to.delete(User.find_by_phone(params["from_number"]))
+      send_to.each do |user| 
         more << {"content" => "#{event.name}(#{event.event_code}): #{msg}", "to_number" => user.phone.to_s}
       end
       return "Message sent: #{msg}", more

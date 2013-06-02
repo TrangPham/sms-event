@@ -4,6 +4,7 @@ class IncomingControllerTest < ActionController::TestCase
 
   def setup
     I18n.locale = :en
+    @user = User.create({:phone => '5551234'})
   end
 
   test "invalid command sends error message" do
@@ -29,11 +30,18 @@ class IncomingControllerTest < ActionController::TestCase
     assert_equal I18n.t('create.response', { description: @event.description, event_code: @event.event_code }), text_answer(response)
   end
 
+<<<<<<< HEAD
   test "register command registers you for event if valid event_id" do
     post :parse, make_response("register 1")
     puts "#{response.body}"
   end
 
+=======
+  test "update commands description" do
+    binding.pry
+    post :parse, make_response("update")
+  end
+>>>>>>> 3367abae8d2c535da7b1a03f61268493600dbbf2
   #
   #  test "register command registers you for event if valid event_id"
   #
@@ -60,11 +68,20 @@ class IncomingControllerTest < ActionController::TestCase
   #  test "info throws error if invalid event_id"
 
   test "settings on should turn on a setting" do
-    e = Event.create({:name => "party", :organizer => User.create({:phone => "5551234"})})
+    e = Event.create({:name => "party", :organizer => @user})
 
     post :parse, make_response("settings #{e.event_code} on talkback")
     e.reload
     assert e.talkback, "event_code #{e.event_code} call_settings returnt #{text_answer(response)}"
+  end
+
+  test "message should not broadcast to sender and should include organizer if not from organizer" do
+    e = Event.create({:name => "party", :organizer => User.create({:phone => "123456"})})
+
+    post :parse, make_response("settings #{e.event_code} on broadcast", "123456")
+
+    post :parse, make_response("message #{e.event_code} Hello There!")
+    assert_equal JSON.parse(response.body), {"messages" => [{"content" => "Message sent: Hello There!"}, {"content" => "#{e.name}(#{e.event_code}): Hello There!", "to_number" => "123456"}]}
   end
 
   private

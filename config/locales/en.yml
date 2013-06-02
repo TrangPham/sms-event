@@ -11,6 +11,23 @@ en:
     cancel: "cancel"
     info: "info"
     settings: "settings"
+    update: "update"
+    talkback: "talkback"
+  
+  confirm:
+    response: "%{name} has been confirmed. They will now recieve messages."
+    confirmation: "Registration confirmed for %{event_name}(%{event_code}). Info: %{info}"
+
+  create:
+    response: "Event %{description} created. Register for event using 'register %{event_code}'"
+      
+  errors:
+    invalid_help: "is not a valid command"
+
+  events:
+    default_name: "No name"
+    default_description: "No description"
+
   help:
     register: "register [event id]"
     help: "Available commands: register create unregister message status. Send 'help COMMAND' for more info"
@@ -20,10 +37,4 @@ en:
     cancel: "cancel [event id]"
     info: "info [event id]"
     settings: "Usage: 'settings [toggle | on | off] [list]' Available Settings: %{settings}"
-  errors:
-    invalid_help: "is not a valid command"
-  events:
-    default_name: "No name"
-    default_description: "No description"
-  create:
-    response: "Event %{description} created. Register for event using 'register %{event_code}'"
+
