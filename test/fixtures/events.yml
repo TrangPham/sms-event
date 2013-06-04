@@ -1,0 +1,9 @@
+test1:
+  event_code: 1
+  name: testEvent
+  description: none
+  organizer: 
+  talkback:  false
+  broadcast:  false
+  notify: false
+  confirm: false
