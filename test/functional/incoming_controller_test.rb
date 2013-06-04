@@ -4,7 +4,7 @@ class IncomingControllerTest < ActionController::TestCase
 
   def setup
     I18n.locale = :en
-    @user = User.create({:phone => '5551234'})
+    @user = users(:organizer_person)
   end
 
   test "invalid command sends error message" do
@@ -70,7 +70,7 @@ class IncomingControllerTest < ActionController::TestCase
   #  test "info throws error if invalid event_id"
 
   test "settings on should turn on a setting" do
-    e = Event.create({:name => "party", :organizer => @user})
+    e = events(:cool_event)
 
     post :parse, make_response("settings #{e.event_code} on talkback")
     e.reload
@@ -88,7 +88,8 @@ class IncomingControllerTest < ActionController::TestCase
 
   private
 
-  def make_response(message, from = '5551234')
+  def make_response(message, from = nil)
+    from ||= @user.phone
     {
       "event"=>"incoming_message",
       "id"=>"SMfd4d42bf3bf831e70fe35b42661d18d2",

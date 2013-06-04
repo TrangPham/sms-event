@@ -1,6 +1,6 @@
-first
-  user_id:  0
-  phone: 613-444-4444
+first:
+  phone: 5551235
   name: first user
-  created_at: <%= Time.now %>
-  updated_at: <%= Time.now %>
+
+organizer_person:
+  phone: 5551234
